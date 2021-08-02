@@ -14,16 +14,6 @@ object CLIParser {
       Opts.option[String]("collection", "List papers in a collection.", short = "c").orNone map ListPapers.apply
     }
 
-  val getPaperBib: Opts[GetPaperBib] =
-    Opts.subcommand("bib", "Get bibtex entry of the paper") {
-      Opts.option[String]("paper", "The paper to retrieve bib", short = "-p") map GetPaperBib.apply
-    }
-
-  val getPaperPdf: Opts[GetPaperPdf] =
-    Opts.subcommand("pdf", "Get associated PDF file path of the paper") {
-      Opts.option[String]("paper", "The paper to retrieve pdf", short = "-p") map GetPaperPdf.apply
-    }
-
   val getPaperInfo: Opts[GetPaperInfo] =
     Opts.subcommand("info", "Get detailed information of the paper") {
       // Opts.argument[Int]("PAPER_ID") map GetPaperInfo.apply
@@ -36,6 +26,6 @@ object CLIParser {
     }
 
   val commandParser: Opts[AppCommand] =
-    listPapersOpts orElse getPaperBib orElse getPaperPdf orElse getPaperInfo
+    listPapersOpts orElse getPaperInfo
 }
 
