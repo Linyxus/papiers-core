@@ -28,6 +28,8 @@ object PapiersApp extends CommandIOApp(
           _ <- IO.println(allFiles map { xs => xs map (_.getName) })
           _ <- IO.println(pdfs)
           _ <- IO.println(metas)
+          lib <- loadLibrary("/Users/linyxus/.papiers/").value
+          _ <- IO.println(lib)
         yield
           code
     }

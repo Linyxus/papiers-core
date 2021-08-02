@@ -36,6 +36,12 @@ object MonadApp {
 
   def liftIO[X](action: IO[X]) = EitherT.liftF(action)
 
+  def liftEither[X](x: Either[AppError, X]): AppM[X] = EitherT.fromEither(x)
+
+  extension[X] (x: Either[AppError, X]) {
+    def liftToAppM: AppM[X] = liftEither(x)
+  }
+
   def safeIO_[X](operation: => X): AppM[X] = EitherT {
     IO {
       Try {
