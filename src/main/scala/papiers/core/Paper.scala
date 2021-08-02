@@ -29,7 +29,8 @@ case class Paper
   override def toString: String =
     val venueText = venue map (", " ++ _) getOrElse ""
     val yearText = year map (" (" ++ _ ++ ")") getOrElse ""
-    s"$title, $authorShorthand$venueText$yearText"
+    val pagesText = pages map (": " ++ _) getOrElse ""
+    s"$title, $authorShorthand$venueText$yearText$pagesText"
 
   def showDetails: String =
     s"  Id: $id" +

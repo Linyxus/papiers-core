@@ -14,7 +14,7 @@ trait CLIApp {
     }
 
   def showPaperBundle(i: Int, bundle: PaperBundle): String =
-    s"[$i]: ${bundle.paper}\n\n    PDF: ${bundle.pdf.toPath.toString}\n"
+    s"[$i]: ${bundle.paper}"
 
   def printLibrary(lib: Map[Int, PaperBundle]): AppM[Unit] = MonadApp.liftIO {
     val strs = lib.toList.map { (i, bundle) => showPaperBundle(i, bundle) }
@@ -28,13 +28,18 @@ trait CLIApp {
   }
 
   def handlePaperInfo(getPaperInfo: GetPaperInfo): AppM[Unit] = getPaperInfo match {
-    case GetPaperInfo(pid) =>
+    case GetPaperInfo(pid, getPdf, _, getSum) =>
       loadLibrary.flatMap { lib =>
         lib.get(pid) match {
           case None => MonadApp.throwError(CLIError(s"paper id does not exist: $pid"))
           case Some(PaperBundle(meta, pdf)) =>
             MonadApp.liftIO {
-              IO.println(meta.showDetails)
+              if getPdf then
+                IO.println(pdf.toPath.toAbsolutePath.toString)
+              else if getSum then
+                IO.println(meta.toString)
+              else
+                IO.println(meta.showDetails)
             }
         }
       }
