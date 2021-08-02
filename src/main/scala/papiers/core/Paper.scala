@@ -14,16 +14,31 @@ case class Paper
   , venue: Option[String]
   , year: Option[String]
   , pages: Option[String]
+  , conferencePaper: Boolean
   ) {
   def authorShorthand: String = authors match {
     case Nil => "unknown"
     case x :: _ => s"${x.surname} et al."
   }
 
+  def authorList: String = authors match {
+    case Nil => "unknown"
+    case xs => authors map { case AuthorName(surname, givenName) => s"$surname, $givenName" } mkString " and "
+  }
+
   override def toString: String =
     val venueText = venue map (", " ++ _) getOrElse ""
     val yearText = year map (" (" ++ _ ++ ")") getOrElse ""
     s"$title, $authorShorthand$venueText$yearText"
+
+  def showDetails: String =
+    s"  Id: $id" +
+      s"\n\n  Title: $title" +
+      s"\n\n  authors: $authorList" +
+      s"\n\n  venue: ${venue getOrElse "unknown"}" +
+      s"\n\n  year: ${year getOrElse "unknown"}" +
+      s"\n\n  pages: ${pages getOrElse "unknwon"}" +
+      s"\n\n  type: ${if conferencePaper then "Conference Paper" else "Informal"}"
 
   def toJson: String = {
     import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._

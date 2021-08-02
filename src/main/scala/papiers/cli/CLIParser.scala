@@ -24,7 +24,12 @@ object CLIParser {
       Opts.option[String]("paper", "The paper to retrieve pdf", short = "-p") map GetPaperPdf.apply
     }
 
+  val getPaperInfo: Opts[GetPaperInfo] =
+    Opts.subcommand("info", "Get detailed information of the paper") {
+      Opts.option[Int]("paper", "The paper to get details", short = "-p") map GetPaperInfo.apply
+    }
+
   val commandParser: Opts[AppCommand] =
-    listPapersOpts orElse getPaperBib orElse getPaperPdf
+    listPapersOpts orElse getPaperBib orElse getPaperPdf orElse getPaperInfo
 }
 

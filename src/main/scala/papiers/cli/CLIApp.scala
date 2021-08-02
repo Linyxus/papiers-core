@@ -27,9 +27,23 @@ trait CLIApp {
       loadLibrary flatMap printLibrary
   }
 
+  def handlePaperInfo(getPaperInfo: GetPaperInfo): AppM[Unit] = getPaperInfo match {
+    case GetPaperInfo(pid) =>
+      loadLibrary.flatMap { lib =>
+        lib.get(pid) match {
+          case None => MonadApp.throwError(CLIError(s"paper id does not exist: $pid"))
+          case Some(PaperBundle(meta, pdf)) =>
+            MonadApp.liftIO {
+              IO.println(meta.showDetails)
+            }
+        }
+      }
+  }
+
   def handleCommand(cmd: AppCommand): IO[ExitCode] = cmd match {
     case cmd: ListPapers => handleListPapers(cmd).execute
-    case _ => IO { ExitCode.Success }
+    case cmd: GetPaperInfo => handlePaperInfo(cmd).execute
+    case _ => IO { ExitCode.Error }
   }
 }
 
