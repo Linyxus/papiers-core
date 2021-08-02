@@ -18,7 +18,7 @@ trait CLIApp {
     s"[$i]: ${bundle.paper}"
 
   def printLibrary(lib: Map[Int, PaperBundle]): AppM[Unit] = MonadApp.liftIO {
-    val strs = lib.toList.map { (i, bundle) => showPaperBundle(i, bundle) }
+    val strs = lib.toList.sortWith({ (a, b) => a._1 < b._1 }).map { (i, bundle) => showPaperBundle(i, bundle) }
 
     IO.println(strs mkString "\n")
   }
