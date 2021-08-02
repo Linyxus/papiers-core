@@ -27,6 +27,11 @@ val circeDep = Seq(
   "io.circe" %% "circe-parser" % "0.15.0-M1",
 )
 
+val pdfBoxDep = Seq(
+  "org.apache.pdfbox" % "pdfbox" % "2.0.24"
+)
+
 libraryDependencies ++= catsDeps
 libraryDependencies ++= declineDeps
 libraryDependencies ++= circeDep
+libraryDependencies ++= pdfBoxDep
