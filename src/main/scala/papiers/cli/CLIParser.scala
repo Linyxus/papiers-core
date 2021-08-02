@@ -6,6 +6,8 @@ import cats.implicits._
 import com.monovore.decline._
 import com.monovore.decline.effect._
 
+import java.nio.file.Path
+
 object CLIParser {
   import AppCommand._
 
@@ -25,7 +27,14 @@ object CLIParser {
       (pid, getPdf, getBib, getSummary) mapN { (pid, pdf, bib, sum) => GetPaperInfo(pid, pdf, bib, sum) }
     }
 
+  val importPaper: Opts[ImportPaper] =
+    Opts.subcommand("add", "Import a new paper") {
+      val pdfPath = Opts.argument[Path]("FILE")
+
+      pdfPath map ImportPaper.apply
+    }
+
   val commandParser: Opts[AppCommand] =
-    listPapersOpts orElse getPaperInfo
+    listPapersOpts orElse getPaperInfo orElse importPaper
 }
 

@@ -1,14 +1,15 @@
 package papiers.io
 
 import scala.io.Source
+import java.io.PrintWriter
 
 import cats.implicits._
 import cats.effect._
-import papiers.core.MonadApp
+import papiers.core._
 import MonadApp._
 
 import java.io.File
-import java.nio.file.Paths
+import java.nio.file.{Path, Paths, Files, StandardCopyOption}
 
 /** A thin cats wrapper around fs utilities provided by jdk. */
 object Tools {
@@ -76,6 +77,30 @@ object Tools {
       MonadApp.throwError(IOError(s"file not exist: ${f.getPath}"))
     else
       MonadApp.pure(f)
+  }
+
+  def writeFile(content: String, path: String): AppM[Unit] =
+    safeIO(err => IOError(s"can not write to file: $err")) {
+      val out = new PrintWriter(new File(path), "UTF-8")
+      try
+        out.print(content)
+      finally
+        out.close()
+    }
+
+  def writeMeta(libDir: String, meta: Paper): AppM[Unit] =
+    val metaDir = Library.getMetaDir(libDir)
+    val metaPath = joinPath(metaDir, s"${meta.id}.json")
+
+    writeFile(meta.toJson, metaPath)
+
+  def copyFile(orig: Path, dest: Path): AppM[Unit] =
+    safeIO(err => IOError(s"can not copy file: $err")) {
+      Files.copy(orig, dest, StandardCopyOption.REPLACE_EXISTING)
+    }
+
+  extension (meta: Paper) {
+    def writeTo(libDir: String): AppM[Unit] = writeMeta(libDir, meta)
   }
 
   extension (f: File) {

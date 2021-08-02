@@ -6,10 +6,12 @@ import papiers.core.MonadApp._
 import papiers.core.{Paper, PaperBundle}
 
 import java.io.File
-import java.nio.file.Paths
+import java.nio.file.{Path, Paths, Files, StandardCopyOption}
+import papiers.core.MonadApp
 
 object Library {
   import papiers.tools.Syntax._
+  import Tools._
 
   def getSubdir(subname: String)(baseDir: String): String =
     Paths.get(baseDir, subname).toAbsolutePath.toString
@@ -57,6 +59,37 @@ object Library {
         }
 
         papersM.chainM map Map.from
+    }
+
+  /** Get available paper id in the library. */
+  def getAvailableId(baseDir: String): AppM[Int] =
+    loadLibrary(baseDir) map (_.keySet.max + 1)
+
+  /** Import one paper into the library. */
+  def importPaper(baseDir: String, pdfPath: Path): AppM[Int] =
+    pdfPath.toFile.ensureExists.flatMap { pdfFile =>
+      getAvailableId(baseDir) flatMap { pid =>
+        def copyPdf: AppM[Unit] = {
+          val pdfDir = getPdfDir(baseDir)
+          val destPath = Paths.get(Tools.joinPath(pdfDir, s"$pid.pdf"))
+
+          Tools.copyFile(pdfPath, destPath)
+        }
+
+        def createMeta: AppM[Unit] =
+          Pdf.getPdfTitle(pdfPath.toFile) flatMap { pdfTitle =>
+            Paper(
+              id = pid,
+              title = pdfTitle,
+              authors = Nil,
+              venue = None,
+              year = None,
+              pages = None
+            ).writeTo(baseDir)
+          }
+
+        copyPdf >> createMeta >> MonadApp.pure(pid)
+      }
     }
 }
 

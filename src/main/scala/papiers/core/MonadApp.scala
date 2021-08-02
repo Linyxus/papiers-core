@@ -78,5 +78,6 @@ object MonadApp {
     def errorPureAction(handler: AppError => X): AppM[X] = mapError(app)(handler)
     def errorAction(handler: AppError => AppM[X]): AppM[X] = handleError(app)(handler)
     def execute: IO[ExitCode] = executeApp(app as ())
+    def asUnit: AppM[Unit] = app >> pure(())
   }
 }

@@ -1,6 +1,7 @@
 package papiers.cli
 
 import cats.effect._
+import cats.implicits._
 import papiers.core._
 import MonadApp._
 import papiers.io._
@@ -45,9 +46,15 @@ trait CLIApp {
       }
   }
 
+  def handleImportPaper(cmd: ImportPaper): AppM[Unit] = cmd match {
+    case ImportPaper(pdfPath) =>
+      Config.getLibraryDir >>= { libDir => Library.importPaper(libDir, pdfPath).asUnit }
+  }
+
   def handleCommand(cmd: AppCommand): IO[ExitCode] = cmd match {
     case cmd: ListPapers => handleListPapers(cmd).execute
     case cmd: GetPaperInfo => handlePaperInfo(cmd).execute
+    case cmd: ImportPaper => handleImportPaper(cmd).execute
     case _ => IO { ExitCode.Error }
   }
 }
