@@ -34,7 +34,7 @@ object MonadApp {
     computation
   }
 
-  def liftIO[X](action: IO[X]) = EitherT.liftF(action)
+  def liftIO[X](action: IO[X]): AppM[X] = EitherT.liftF(action)
 
   def liftEither[X](x: Either[AppError, X]): AppM[X] = EitherT.fromEither(x)
 

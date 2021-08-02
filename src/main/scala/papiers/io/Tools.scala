@@ -12,6 +12,9 @@ import java.nio.file.Paths
 
 /** A thin cats wrapper around fs utilities provided by jdk. */
 object Tools {
+  def joinPath(path: String, ext: String): String =
+    Paths.get(path, ext).toAbsolutePath.toString
+
   def listFiles(dirPath: String): AppM[List[File]] =
     val errorF = (x: Throwable) => IOError(s"can not list directory $dirPath: ${x.toString}")
 
