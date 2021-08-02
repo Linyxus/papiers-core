@@ -14,7 +14,7 @@ case class Paper
   , venue: Option[String]
   , year: Option[String]
   , pages: Option[String]
-  , conferencePaper: Boolean
+  , conferencePaper: Boolean = false
   ) {
   def authorShorthand: String = authors match {
     case Nil => "unknown"
