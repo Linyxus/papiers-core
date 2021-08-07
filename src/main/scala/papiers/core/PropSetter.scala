@@ -33,7 +33,27 @@ object PropSetter:
       paper.copy(authors = authors)
   }
 
+  val venueSetter = new PropSetter {
+    type V = String
+
+    val p: StrParser[V] = implicitly
+
+    override def set(paper: Paper, venue: String): Paper =
+      paper.copy(venue = Some(venue))
+  }
+
+  val yearSetter = new PropSetter {
+    type V = String
+
+    val p: StrParser[V] = implicitly
+
+    override def set(paper: Paper, year: String): Paper =
+      paper.copy(year = Some(year))
+  }
+
   val allSetters: Map[String, PropSetter] = Map(
     "title" -> titleSetter,
-    "authors" -> authorSetter
+    "authors" -> authorSetter,
+    "venue" -> venueSetter,
+    "year" -> yearSetter
   )
