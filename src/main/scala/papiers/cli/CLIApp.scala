@@ -4,7 +4,10 @@ import cats.effect._
 import cats.implicits._
 import papiers.core._
 import MonadApp._
+import PropSetter.allSetters
+import StrParser.given
 import papiers.io._
+import papiers.tools.Syntax._
 
 trait CLIApp {
   import AppCommand._
@@ -51,10 +54,31 @@ trait CLIApp {
       Config.getLibraryDir >>= { libDir => Library.importPaper(libDir, pdfPath).asUnit }
   }
 
+  def handleSetProp(cmd: SetProp): AppM[Unit] = cmd match
+    case SetProp(pid, k, v) =>
+      loadLibrary >>= { lib =>
+        def getPaper: AppM[Paper] = lib get pid match
+          case None => MonadApp.throwError(CLIError(s"paper id does not exist: $pid"))
+          case Some(PaperBundle(meta, pdf)) => MonadApp.pure { meta }
+
+        def getSetter: AppM[PropSetter] = allSetters get k match
+          case None => MonadApp.throwError(CLIError(s"can not set property: $k"))
+          case Some(setter) => MonadApp.pure { setter }
+
+        (getPaper, getSetter).tupleM >>= { (paper, setter) =>
+          setter.setProp(paper, v) match
+            case None => MonadApp.throwError(CLIError(s"can not parse value: $v"))
+            case Some(paper) =>
+              import Tools._
+              Config.getLibraryDir >>= { libDir => paper.writeTo(libDir) }
+        }
+      }
+
   def handleCommand(cmd: AppCommand): IO[ExitCode] = cmd match {
     case cmd: ListPapers => handleListPapers(cmd).execute
     case cmd: GetPaperInfo => handlePaperInfo(cmd).execute
     case cmd: ImportPaper => handleImportPaper(cmd).execute
+    case cmd: SetProp => handleSetProp(cmd).execute
     case _ => IO { ExitCode.Error }
   }
 }

@@ -34,7 +34,16 @@ object CLIParser {
       pdfPath map ImportPaper.apply
     }
 
+  def setPropParser: Opts[SetProp] =
+    Opts.subcommand("set", "Set the metadata of a paper") {
+      val key = Opts.argument[String]("KEY")
+      val pid = Opts.argument[Int]("PAPER")
+      val value = Opts.argument[String]("VALUE")
+
+      (pid, key, value) mapN { (pid, key, value) => SetProp(pid, key, value) }
+    }
+
   val commandParser: Opts[AppCommand] =
-    listPapersOpts orElse getPaperInfo orElse importPaper
+    listPapersOpts orElse getPaperInfo orElse importPaper orElse setPropParser
 }
 

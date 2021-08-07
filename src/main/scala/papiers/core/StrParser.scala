@@ -12,6 +12,9 @@ object StrParser {
   given StrParser[Int] with
     override def parse(s: String): Option[Int] = s.toIntOption
 
+  given StrParser[String] with
+    override def parse(s: String): Option[String] = Some(s)
+
   given StrParser[Boolean] with
     override def parse(s: String): Option[Boolean] = s match
       case "true" | "True" | "t" => Some(true)
