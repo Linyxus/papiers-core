@@ -28,10 +28,21 @@ val circeDep = Seq(
 )
 
 val pdfBoxDep = Seq(
-  "org.apache.pdfbox" % "pdfbox" % "2.0.24"
+  "org.apache.pdfbox" % "pdfbox" % "2.0.24",
+)
+
+val sttpDep = Seq(
+  "com.softwaremill.sttp.client3" %% "core" % "3.3.13",
+  "com.softwaremill.sttp.client3" %% "async-http-client-backend-cats" % "3.3.13"
+)
+
+val json4sDep = Seq(
+  "org.json4s" %% "json4s-native" % "4.0.3"
 )
 
 libraryDependencies ++= catsDeps
 libraryDependencies ++= declineDeps
 libraryDependencies ++= circeDep
 libraryDependencies ++= pdfBoxDep
+libraryDependencies ++= sttpDep
+libraryDependencies ++= json4sDep
