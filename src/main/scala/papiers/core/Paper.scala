@@ -23,7 +23,7 @@ case class Paper
 
   def authorList: String = authors match {
     case Nil => "unknown"
-    case xs => authors map { case AuthorName(surname, givenName) => s"$surname, $givenName" } mkString " and "
+    case xs => authors map { case AuthorName(surname, givenName) => s"$givenName $surname" } mkString ", "
   }
 
   override def toString: String =
