@@ -27,8 +27,9 @@ trait CLIApp {
   }
 
   def handleListPapers(listPapers: ListPapers): AppM[Unit] = listPapers match {
-    case ListPapers(_) =>
-      loadLibrary flatMap printLibrary
+    case ListPapers(qs, _) =>
+      def paperFilter: PaperFilter = PaperFilter.product(qs map PaperFilter.titleFilter)
+      loadLibrary map { lib => lib.filter { (k, v) => paperFilter(v.paper) } } flatMap printLibrary
   }
 
   def handlePaperInfo(getPaperInfo: GetPaperInfo): AppM[Unit] = getPaperInfo match {

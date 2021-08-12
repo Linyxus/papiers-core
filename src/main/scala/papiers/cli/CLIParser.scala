@@ -13,7 +13,13 @@ object CLIParser {
 
   val listPapersOpts: Opts[ListPapers] =
     Opts.subcommand("ls", "List all papers") {
-      Opts.option[String]("collection", "List papers in a collection.", short = "c").orNone map ListPapers.apply
+      val query = Opts.arguments[String]("PAPER").orNone map {
+        case None => Nil
+        case Some(x) => x.toList
+      }
+      val collection = Opts.option[String]("collection", "List papers in a collection.", short = "c").orNone
+
+      (query, collection) mapN { (q, c) => ListPapers(q, c) }
     }
 
   val getPaperInfo: Opts[GetPaperInfo] =
