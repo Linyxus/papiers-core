@@ -15,7 +15,5 @@ object PapiersApp extends CommandIOApp(
   version = "0.0.0"
 ) {
   override def main: Opts[IO[ExitCode]] =
-    commandParser map {
-      case c => handleCommand(c)
-    }
+    commandParser map handleCommand
 }
