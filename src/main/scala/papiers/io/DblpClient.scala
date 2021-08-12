@@ -39,11 +39,13 @@ trait DblpClient {
       .map(parse(_))
       .handleErrorWith(err => MonadApp.throwError(IOError(s"can not parse json: $err")))
 
+  /** Query Dblp matches of title. */
   def query(title: String): AppM[List[DblpResponse]] =
     def buildQueryUri: Uri = uri"https://dblp.org/search/publ/api?q=$title&h=1000&format=json"
 
     getJson(buildQueryUri) map DblpResponse.fromBodyJson
 
+  /** Find best match for title among all the matches. */
   def findBestMatch(title: String, matches: List[DblpResponse]): Option[DblpResponse] =
     /** Filter out the matches whose title does not match the expected title exactly */
     def isExactMatch(t1: String, t2: String): Boolean =
@@ -51,17 +53,20 @@ trait DblpClient {
       val words2 = t2.toLowerCase.split("\\s+")
       words1.length == words2.length && (words1 zip words2 forall { (w1, w2) => (w1 startsWith w2) || (w2 startsWith w1) })
 
+    /** A should be considered a better match than B, if A is formal but B is not. */
     def betterThan(p1: DblpResponse, p2: DblpResponse): Boolean =
       !p1.informal && p2.informal
 
     (matches filter { p => isExactMatch(title, p.title) } sortWith betterThan).headOption
 
+  /** Find the best match for the title. */
   def matchTitle(title: String): AppM[DblpResponse] = query(title) flatMap { matches =>
     findBestMatch(title, matches) match
       case None => MonadApp.throwError(IOError(s"could not find match for $title, candidates: $matches"))
       case Some(m) => MonadApp.pure(m)
   }
 
+  /** Updated paper meta based on the match. */
   def updatePaperWithMatch(p: Paper, resp: DblpResponse): AppM[Paper] =
     import PropSetter._
     def getPaper1 = authorSetter.setProp(p, resp.authors mkString ", ") match
@@ -77,6 +82,7 @@ trait DblpClient {
       )
     }
 
+  /** Match a paper on Dblp. Return the updated paper (if successful). */
   def matchPaper(p: Paper): AppM[Paper] =
     matchTitle(p.title) >>= { resp => updatePaperWithMatch(p, resp) }
 }
