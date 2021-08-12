@@ -74,11 +74,27 @@ trait CLIApp {
         }
       }
 
+  def handleMatchPaper(cmd: MatchPaper): AppM[Unit] = cmd match
+    case MatchPaper(pid) =>
+      loadLibrary >>= { lib =>
+        def getPaper: AppM[Paper] = lib get pid match
+          case None => MonadApp.throwError(CLIError(s"paper id does not exist: $pid"))
+          case Some(PaperBundle(meta, pdf)) => MonadApp.pure { meta }
+
+        getPaper >>= DblpClient.matchPaper >>= { p =>
+          import Tools._
+          MonadApp.liftIO {
+            IO.println(p.showDetails)
+          } >> { Config.getLibraryDir >>= { libDir => p.writeTo(libDir) } }
+        }
+      }
+
   def handleCommand(cmd: AppCommand): IO[ExitCode] = cmd match {
     case cmd: ListPapers => handleListPapers(cmd).execute
     case cmd: GetPaperInfo => handlePaperInfo(cmd).execute
     case cmd: ImportPaper => handleImportPaper(cmd).execute
     case cmd: SetProp => handleSetProp(cmd).execute
+    case cmd: MatchPaper => handleMatchPaper(cmd).execute
     case _ => IO { ExitCode.Error }
   }
 }

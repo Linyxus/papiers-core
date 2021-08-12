@@ -7,6 +7,7 @@ enum AppCommand {
   case GetPaperInfo(paper: Int, getPdf: Boolean, getBib: Boolean, getSummary: Boolean)
   case ImportPaper(pdfPath: Path)
   case SetProp(paper: Int, key: String, value: String)
+  case MatchPaper(paper: Int)
   case Serve(bind: String, port: String)
 }
 
