@@ -38,7 +38,7 @@ case class Paper
       s"\n\n  authors: $authorList" +
       s"\n\n  venue: ${venue getOrElse "unknown"}" +
       s"\n\n  year: ${year getOrElse "unknown"}" +
-      s"\n\n  pages: ${pages getOrElse "unknwon"}" +
+      s"\n\n  pages: ${pages getOrElse "unknown"}" +
       s"\n\n  type: ${if conferencePaper then "Conference Paper" else "Informal"}"
 
   def toJson: String = {
