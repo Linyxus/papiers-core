@@ -19,13 +19,23 @@ object DblpResponse:
     case None => Nil
     case Some(hits) =>
       def buildFromEntry(value: JValue): Option[DblpResponse] =
+        def cleanAuthorName(name: String): String =
+          name.split("\\s+").toList match {
+            case xs if xs.length >= 3 =>
+              if xs.last.toIntOption.isDefined then
+                xs.dropRight(1).mkString(" ")
+              else
+                name
+            case _ => name
+          }
+
         def getTitle = value.selectAsString(List("info", "title"))
         def getVenue = value.selectAsString(List("info", "venue"))
         def getYear = value.selectAsString(List("info", "year"))
         def getInformal = value.selectAsString(List("info", "type")) map (_ == "Informal Publications")
         def getPages = value.selectAsString(List("info", "pages"))
         def getAuthors = value.selectAsList(List("info", "authors", "author")) map { authors =>
-          authors flatMap { author => author.selectAsString(List("text")) }
+          authors flatMap { author => author.selectAsString(List("text")) map cleanAuthorName }
         }
 
         for
