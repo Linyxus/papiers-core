@@ -34,7 +34,7 @@ trait Pdf {
       }
 
     extractTitle.flatMap { res =>
-      if res.nonEmpty then MonadApp.pure(res)
+      if res.ne(null) && res.nonEmpty then MonadApp.pure(res)
       else extractTitleByText
     }
 }
