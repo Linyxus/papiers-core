@@ -29,7 +29,12 @@ object DblpResponse:
             case _ => name
           }
 
-        def getTitle = value.selectAsString(List("info", "title"))
+        extension (s: String) {
+          def replaceWebChar: String =
+            s.replaceAll("&apos;", "'")
+        }
+
+        def getTitle = value.selectAsString(List("info", "title")) map { x => x.replaceWebChar }
         def getVenue = value.selectAsString(List("info", "venue"))
         def getYear = value.selectAsString(List("info", "year"))
         def getInformal = value.selectAsString(List("info", "type")) map (_ == "Informal Publications")
