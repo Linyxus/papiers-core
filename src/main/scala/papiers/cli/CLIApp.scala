@@ -9,6 +9,8 @@ import StrParser.given
 import papiers.io._
 import papiers.tools.Syntax._
 
+import java.nio.file.Paths
+
 trait CLIApp {
   import AppCommand._
 
@@ -55,6 +57,26 @@ trait CLIApp {
       Config.getLibraryDir >>= { libDir => Library.importPaper(libDir, pdfPath).asUnit }
   }
 
+  private def downloadPaper(url: String): AppM[Unit] =
+    def savePath(libDir: String): String = Tools.joinPath(libDir, "temp.pdf")
+
+    def download(libDir: String): AppM[Unit] =
+      Download.downloadFile(url, savePath(libDir))
+
+    def doImport(libDir: String): AppM[Unit] =
+      val p = Paths.get(savePath(libDir))
+      Library.importPaper(libDir, p).asUnit
+
+    Config.getLibraryDir >>= { libDir =>
+      download(libDir) >> doImport(libDir)
+    }
+
+  def handleDownloadPaper(cmd: DownloadPaper): AppM[Unit] = cmd match
+    case DownloadPaper(url, true) =>
+      val realUrl = s"https://arxiv.org/pdf/$url.pdf"
+      downloadPaper(realUrl)
+    case DownloadPaper(url, _) => downloadPaper(url)
+
   def handleSetProp(cmd: SetProp): AppM[Unit] = cmd match
     case SetProp(pid, k, v) =>
       loadLibrary >>= { lib =>
@@ -94,6 +116,7 @@ trait CLIApp {
     case cmd: ListPapers => handleListPapers(cmd).execute
     case cmd: GetPaperInfo => handlePaperInfo(cmd).execute
     case cmd: ImportPaper => handleImportPaper(cmd).execute
+    case cmd: DownloadPaper => handleDownloadPaper(cmd).execute
     case cmd: SetProp => handleSetProp(cmd).execute
     case cmd: MatchPaper => handleMatchPaper(cmd).execute
     case _ => IO { ExitCode.Error }

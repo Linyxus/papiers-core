@@ -40,6 +40,14 @@ object CLIParser {
       pdfPath map ImportPaper.apply
     }
 
+  val downloadPaper: Opts[DownloadPaper] =
+    Opts.subcommand("dl", "Download and import a paper from url") {
+      val pdfPath = Opts.argument[String]("URL")
+      val arxiv = Opts.flag("arxiv", help = "Import arxiv paper", short = "-a").orFalse
+
+      (pdfPath, arxiv) mapN DownloadPaper.apply
+    }
+
   val setPropParser: Opts[SetProp] =
     Opts.subcommand("set", "Set the metadata of a paper") {
       val key = Opts.argument[String]("KEY")
@@ -57,6 +65,6 @@ object CLIParser {
     }
 
   val commandParser: Opts[AppCommand] =
-    listPapersOpts orElse getPaperInfo orElse importPaper orElse setPropParser orElse matchPaperParser
+    listPapersOpts orElse getPaperInfo orElse importPaper orElse setPropParser orElse matchPaperParser orElse downloadPaper
 }
 
