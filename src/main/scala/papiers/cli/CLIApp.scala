@@ -11,7 +11,7 @@ import papiers.tools.Syntax._
 
 import java.nio.file.Paths
 
-trait CLIApp {
+trait CLIApp extends BibPrinter {
   import AppCommand._
 
   def loadLibrary: AppM[Map[Int, PaperBundle]] =
@@ -35,7 +35,7 @@ trait CLIApp {
   }
 
   def handlePaperInfo(getPaperInfo: GetPaperInfo): AppM[Unit] = getPaperInfo match {
-    case GetPaperInfo(pid, getPdf, _, getSum) =>
+    case GetPaperInfo(pid, getPdf, getBib, getSum) =>
       loadLibrary.flatMap { lib =>
         lib.get(pid) match {
           case None => MonadApp.throwError(CLIError(s"paper id does not exist: $pid"))
@@ -45,6 +45,8 @@ trait CLIApp {
                 IO.println(pdf.toPath.toAbsolutePath.toString)
               else if getSum then
                 IO.println(meta.toString)
+              else if getBib then
+                IO.println(meta.toBib)
               else
                 IO.println(meta.showDetails)
             }
