@@ -49,8 +49,8 @@ trait DblpClient {
   def findBestMatch(title: String, matches: List[DblpResponse]): Option[DblpResponse] =
     /** Filter out the matches whose title does not match the expected title exactly */
     def isExactMatch(t1: String, t2: String): Boolean =
-      val words1 = t1.toLowerCase.split("\\s+")
-      val words2 = t2.toLowerCase.split("\\s+")
+      val words1 = t1.toLowerCase.split("\\s+") filterNot (_ == "-")
+      val words2 = t2.toLowerCase.split("\\s+") filterNot (_ == "-")
       words1.length == words2.length && (words1 zip words2 forall { (w1, w2) => (w1 startsWith w2) || (w2 startsWith w1) })
 
     /** A should be considered a better match than B, if A is formal but B is not. */
