@@ -3,6 +3,8 @@ package papiers.cli
 import cats.effect._
 import cats.implicits._
 
+import papiers.app._
+
 import com.monovore.decline._
 import com.monovore.decline.effect._
 

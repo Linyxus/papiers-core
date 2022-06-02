@@ -1,4 +1,4 @@
-package papiers.cli
+package papiers.app
 
 import java.nio.file.Path
 
