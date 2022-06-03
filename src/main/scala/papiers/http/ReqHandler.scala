@@ -21,7 +21,15 @@ object ReqHandler extends PaperInstances with AppHandler {
   def listPapers(query: Option[String]): AppM[PaperList] =
     val queries = query.getOrElse("").split(" ").toList
     val paperFilter = PaperFilter.product(queries map PaperFilter.titleFilter)
-    loadLibrary map { lib => lib.filter { (k, v) => paperFilter(v.paper) } } map { lib => lib.map { (_, v) => v.paper } } map { x => x.toList } map PaperList.apply
+    loadLibrary
+      .map { lib => lib.filter { (k, v) => paperFilter(v.paper) } }
+      .map { lib =>
+        lib.map { (_, v) =>
+          Document(v.paper, v.paper.toString, v.paper.toBib, v.pdf.toPath.toAbsolutePath.toString)
+        }
+      }
+      .map { x => x.toList }
+      .map(PaperList.apply)
 
   /** Retrieve paper information with given operator. */
   def getInfoWith[X](f: PaperBundle => X)(paperId: Int): AppM[X] =

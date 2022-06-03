@@ -18,7 +18,11 @@ import papiers.core._
 import cats.data.AppFuncInstances
 
 trait AppResp extends PaperInstances {
-  case class PaperList(papers: List[Paper])
+  case class Document(paper: Paper, summary: String, bib: String, pdfPath: String)
+  given Encoder[Document] = Encoder.AsObject.derived[Document]
+    given EntityEncoder[IO, Document] = jsonEncoderOf
+
+  case class PaperList(papers: List[Document])
 
   given Encoder[PaperList] = Encoder.AsObject.derived[PaperList]
   given EntityEncoder[IO, PaperList] = jsonEncoderOf
