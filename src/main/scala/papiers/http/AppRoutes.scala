@@ -26,10 +26,12 @@ object AppRoutes extends AppResp {
     def adaptHttp(using EntityEncoder[IO, X]) = adaptApp(m)
   }
 
+  object ListingQueryParameterMatcher extends OptionalQueryParamDecoderMatcher[String]("q")
+
   def coreRoutes: HttpRoutes[IO] =
     HttpRoutes.of[IO] {
-      case GET -> Root / "ls" =>
-        ReqHandler.listPapers.adaptHttp
+      case GET -> Root / "ls" :? ListingQueryParameterMatcher(query)  =>
+        ReqHandler.listPapers(query).adaptHttp
 
       case GET -> Root / "info" / "sum" / IntVar(paperId) =>
         ReqHandler.getSummary(paperId).adaptHttp
