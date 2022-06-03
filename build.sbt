@@ -1,4 +1,9 @@
 val scala3Version = "3.1.0"
+val http4sVersion = "1.0.0-M29"
+val munitVersion = "0.7.29"
+val logbackVersion = "1.2.6"
+val munitCatsEffectVersion = "1.0.6"
+
 
 lazy val root = project
   .in(file("."))
@@ -40,9 +45,21 @@ val json4sDep = Seq(
   "org.json4s" %% "json4s-native" % "4.0.3"
 )
 
+val http4sDep = Seq(
+  "org.http4s"      %% "http4s-ember-server" % http4sVersion,
+  "org.http4s"      %% "http4s-ember-client" % http4sVersion,
+  "org.http4s"      %% "http4s-circe"        % http4sVersion,
+  "org.http4s"      %% "http4s-dsl"          % http4sVersion,
+  "org.scalameta"   %% "munit"               % munitVersion           % Test,
+  "org.typelevel"   %% "munit-cats-effect-3" % munitCatsEffectVersion % Test,
+  "ch.qos.logback"  %  "logback-classic"     % logbackVersion,
+)
+
+
 libraryDependencies ++= catsDeps
 libraryDependencies ++= declineDeps
 libraryDependencies ++= circeDep
 libraryDependencies ++= pdfBoxDep
 libraryDependencies ++= sttpDep
 libraryDependencies ++= json4sDep
+libraryDependencies ++= http4sDep

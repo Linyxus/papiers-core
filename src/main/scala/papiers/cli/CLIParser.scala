@@ -2,16 +2,34 @@ package papiers.cli
 
 import cats.effect._
 import cats.implicits._
+import cats.data.Validated
 
 import papiers.app._
 
 import com.monovore.decline._
 import com.monovore.decline.effect._
 
+import com.comcast.ip4s._
+
 import java.nio.file.Path
 
 object CLIParser {
   import AppCommand._
+  import CliCommand._
+
+  val runDaemonOpts: Opts[RunDaemon] =
+    Opts.subcommand("daemon", "Run Http daemon") {
+      val port = Opts.option[String]("port", "Port to listen on.", short = "p").orNone
+
+      port mapValidated {
+        case None => Validated.valid(RunDaemon(port"8080"))
+        case Some(port) =>
+          Port.fromString(port) match {
+            case None => Validated.invalidNel(s"Invalid port: $port")
+            case Some(port) => Validated.valid(RunDaemon(port))
+          }
+      }
+    }
 
   val listPapersOpts: Opts[ListPapers] =
     Opts.subcommand("ls", "List all papers") {
@@ -66,7 +84,7 @@ object CLIParser {
       paper map { pid => MatchPaper(pid) }
     }
 
-  val commandParser: Opts[AppCommand] =
-    listPapersOpts orElse getPaperInfo orElse importPaper orElse setPropParser orElse matchPaperParser orElse downloadPaper
+  val commandParser: Opts[AppCommand | CliCommand] =
+    listPapersOpts orElse getPaperInfo orElse importPaper orElse setPropParser orElse matchPaperParser orElse downloadPaper orElse runDaemonOpts
 }
 
