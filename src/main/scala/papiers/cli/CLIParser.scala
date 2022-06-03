@@ -22,7 +22,7 @@ object CLIParser {
       val port = Opts.option[String]("port", "Port to listen on.", short = "p").orNone
 
       port mapValidated {
-        case None => Validated.valid(RunDaemon(port"8080"))
+        case None => Validated.valid(RunDaemon(port"8990"))
         case Some(port) =>
           Port.fromString(port) match {
             case None => Validated.invalidNel(s"Invalid port: $port")
