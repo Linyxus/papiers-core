@@ -12,7 +12,7 @@ import org.http4s.server.middleware.Logger
 object AppServer {
   def run(port: Port): IO[Nothing] = {
     def service = {
-          val httpApp = AppRoutes.testRoutes.orNotFound
+          val httpApp = (AppRoutes.testRoutes <+> AppRoutes.coreRoutes).orNotFound
           val finalHttpApp = Logger.httpApp(true, true)(httpApp)
           EmberServerBuilder.default[IO]
             .withHost(ipv4"0.0.0.0")
