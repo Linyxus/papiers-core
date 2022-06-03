@@ -13,12 +13,15 @@ import papiers.app._
 
 import java.nio.file.Paths
 
+/** Handler for Http requests */
 object ReqHandler extends PaperInstances with AppHandler {
   import AppResp._
 
+  /** List all papers. */
   def listPapers: AppM[PaperList] =
     loadLibrary map { lib => lib.map { (_, v) => v.paper } } map { x => x.toList } map PaperList.apply
 
+  /** Retrieve paper information with given operator. */
   def getInfoWith[X](f: PaperBundle => X)(paperId: Int): AppM[X] =
     loadLibrary flatMap { lib =>
       lib.get(paperId) match {
