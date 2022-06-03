@@ -22,6 +22,18 @@ trait AppResp extends PaperInstances {
 
   given Encoder[PaperList] = Encoder.AsObject.derived[PaperList]
   given EntityEncoder[IO, PaperList] = jsonEncoderOf
+
+  case class PaperSummary(summary: String)
+  given Encoder[PaperSummary] = Encoder.AsObject.derived[PaperSummary]
+  given EntityEncoder[IO, PaperSummary] = jsonEncoderOf
+
+  case class PaperBib(bib: String)
+  given Encoder[PaperBib] = Encoder.AsObject.derived[PaperBib]
+  given EntityEncoder[IO, PaperBib] = jsonEncoderOf
+
+  case class PaperPdf(pdfPath: String)
+  given Encoder[PaperPdf] = Encoder.AsObject.derived[PaperPdf]
+    given EntityEncoder[IO, PaperPdf] = jsonEncoderOf
 }
 
 object AppResp extends AppResp

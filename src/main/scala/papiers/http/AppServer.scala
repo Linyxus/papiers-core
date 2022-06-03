@@ -10,6 +10,7 @@ import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.server.middleware.Logger
 
 object AppServer {
+
   def run(port: Port): IO[Nothing] = {
     def service = {
           val httpApp = (AppRoutes.testRoutes <+> AppRoutes.coreRoutes).orNotFound
