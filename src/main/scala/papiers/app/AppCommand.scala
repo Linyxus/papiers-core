@@ -9,4 +9,5 @@ enum AppCommand:
   case DownloadPaper(url: String, arxiv: Boolean)
   case SetProp(paper: Int, key: String, value: String)
   case MatchPaper(paper: Int)
+  case SyncBib()
   case Serve(bind: String, port: String)

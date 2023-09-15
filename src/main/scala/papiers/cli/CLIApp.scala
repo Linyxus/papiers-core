@@ -24,6 +24,7 @@ trait CLIApp extends AppHandler {
     case cmd: DownloadPaper => handleDownloadPaper(cmd).execute
     case cmd: SetProp => handleSetProp(cmd).execute
     case cmd: MatchPaper => handleMatchPaper(cmd).execute
+    case cmd: SyncBib => handleSyncBib(cmd).execute
     case RunDaemon(port) => AppServer.run(port).as(ExitCode.Success)
     case _ => IO { ExitCode.Error }
   }

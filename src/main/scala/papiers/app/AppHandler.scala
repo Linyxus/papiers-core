@@ -114,3 +114,6 @@ trait AppHandler extends BibPrinter:
           } >> { Config.getLibraryDir >>= { libDir => p.writeTo(libDir) } }
         }
       }
+
+  def handleSyncBib(cmd: SyncBib): AppM[Unit] =
+     loadLibrary.map(lib => lib.values.toList) >>= Library.outputBibBundle

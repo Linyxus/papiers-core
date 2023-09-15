@@ -84,7 +84,10 @@ object CLIParser {
       paper map { pid => MatchPaper(pid) }
     }
 
+  val syncBibParser: Opts[SyncBib] =
+    Opts.subcommand("sync-bib", "Sync the .bib bundle file")(Opts.unit).map(_ => SyncBib())
+
   val commandParser: Opts[AppCommand | CliCommand] =
-    listPapersOpts orElse getPaperInfo orElse importPaper orElse setPropParser orElse matchPaperParser orElse downloadPaper orElse runDaemonOpts
+    listPapersOpts orElse getPaperInfo orElse importPaper orElse setPropParser orElse matchPaperParser orElse downloadPaper orElse runDaemonOpts orElse syncBibParser
 }
 

@@ -3,7 +3,7 @@ package papiers.core
 import scala.collection.mutable.StringBuilder
 
 object BibPrinter extends BibPrinter {
-  def showBib(meta: Paper): String = {
+  def showBib(meta: Paper, filePath: Option[String] = None): String = {
     /** Print author name in the form of surname, given name. */
     def showAuthor(author: AuthorName): String = s"${author.surname}, ${author.givenName}"
 
@@ -31,12 +31,21 @@ object BibPrinter extends BibPrinter {
       meta.venue map aliasVenue foreach { venue => sb ++= s"booktitle = {${venue}},\n" }
       meta.pages foreach { pages => sb ++= s"pages = {${pages}},\n" }
 
+      filePath foreach { fp => sb ++= s"pdf = {$fp},\n" }
+
       sb ++= s"title = {${meta.title}}\n}\n"
 
       sb.toString
     }
 
     show(meta)
+  }
+
+  def showBib(bundle: List[PaperBundle], includePdfPath: Boolean): String = {
+    val bibStrs = bundle.map { case PaperBundle(paper, pdf) =>
+      showBib(paper, if includePdfPath then Some(pdf.toPath.toAbsolutePath.toString) else None)
+    }
+    bibStrs.mkString("\n\n")
   }
 }
 

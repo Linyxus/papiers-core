@@ -8,6 +8,7 @@ import papiers.core.{Paper, PaperBundle}
 import java.io.File
 import java.nio.file.{Path, Paths, Files, StandardCopyOption}
 import papiers.core.MonadApp
+import papiers.core.BibPrinter
 
 object Library {
   import papiers.tools.Syntax._
@@ -48,12 +49,12 @@ object Library {
     Tools.getContent(jsonFile) flatMap { s => Paper.fromJson(s).liftToAppM }
 
   def loadLibrary(baseDir: String): AppM[Map[Int, PaperBundle]] =
-    (Tools.listPdfs(getPdfDir(baseDir)), Tools.listMetas(getMetaDir(baseDir))).tupleM flatMap { 
-      (pdfList, metaList) => 
+    (Tools.listPdfs(getPdfDir(baseDir)), Tools.listMetas(getMetaDir(baseDir))).tupleM flatMap {
+      (pdfList, metaList) =>
         val pdfMap = Map.from(pdfList)
         val metaMap = Map.from(metaList)
         val validIdx = pdfMap.keySet intersect metaMap.keySet
-        
+
         val papersM: List[AppM[(Int, PaperBundle)]] = validIdx.toList map { i =>
           loadPaper(metaMap(i)) map { pap => i -> PaperBundle(pap, pdfMap(i)) }
         }
@@ -91,5 +92,11 @@ object Library {
         copyPdf >> createMeta >> MonadApp.pure(pid)
       }
     }
+
+  def outputBibBundle(bundle: List[PaperBundle]): AppM[Unit] =
+    def bibStr: String = BibPrinter.showBib(bundle, includePdfPath = true)
+    def outputFile(path: String): AppM[Unit] =
+      writeFile(bibStr, path)
+    Config.getBibBundlePath >>= outputFile
 }
 
